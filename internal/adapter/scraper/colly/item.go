@@ -42,8 +42,13 @@ func (is *itemScraper) UpdateItems() {
 
 	})
 
+	// // Find and visit next page links
+	// is.c.OnHTML(".next", func(e *colly.HTMLElement) {
+	// 	fmt.Printf("element %s", e.Name)
+	// 	e.Request.Visit(e.Attr("href"))
+	// })
 	// Find and visit next page links
-	is.c.OnHTML(`.next a[href]`, func(e *colly.HTMLElement) {
+	is.c.OnXML(`//div[@class="shop-loop-after clearfix"]/nav[@class="woocommerce-pagination"]/ul[@class="page-numbers"]/li/a[@class="next page-numbers"]`, func(e *colly.XMLElement) {
 		e.Request.Visit(e.Attr("href"))
 	})
 
@@ -51,7 +56,12 @@ func (is *itemScraper) UpdateItems() {
 		fmt.Println("Visiting", r.URL.String())
 	})
 
-	for {
-		is.c.Visit("https://store.xkcd.com/collections/everything")
-	}
+	// Set error handler
+	is.c.OnError(func(r *colly.Response, err error) {
+		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+	})
+	// for {
+	is.c.Visit("https://www.addisber.com/shop/page/255/")
+	// is.c.Visit("https://www.addisber.com/shop/")
+	// }
 }

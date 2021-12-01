@@ -14,7 +14,7 @@ import (
 )
 
 func Initialize() {
-	dsn := "postgres://postgres:admin@localhost:5432/base_db?sslmode=disable"
+	dsn := "postgres://postgres:admin@localhost:5432/scrap?sslmode=disable"
 	// TODO: use connection pool
 	conn, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
@@ -35,7 +35,10 @@ func Initialize() {
 	// Instantiate default collector
 	c := colly.NewCollector(
 		colly.AllowURLRevisit(),
+		// colly.Debugger(&debug.LogDebugger{}),
+		// colly.Async(true),
 	)
+	// c.Wait()
 
 	scrapHandler := scraper.ItemInit(c, itemUsecase)
 

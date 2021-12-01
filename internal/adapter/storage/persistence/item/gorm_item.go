@@ -1,7 +1,7 @@
 package item
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/LibenHailu/addisber_scraper/internal/constant/model"
 	"gorm.io/gorm"
@@ -24,6 +24,11 @@ func (gp *itemGormPersistence) UpdateItem(item *model.Item) error {
 	foundItem := model.Item{}
 	err := gp.conn.First(&foundItem, "addisber_id = ?", item.AddisberID).Error
 
-	fmt.Println(err)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = gp.conn.Create(&item).Error
+		// fmt.Println(err)
+		return err
+	}
+	// fmt.Println(err)
 	return err
 }
