@@ -4,10 +4,13 @@ import (
 	"log"
 	"os"
 
+	"github.com/LibenHailu/addisber_scraper/internal/adapter/glue/routing"
+	"github.com/LibenHailu/addisber_scraper/internal/adapter/http/rest/server"
 	scraper "github.com/LibenHailu/addisber_scraper/internal/adapter/scraper/colly"
 	itemPersist "github.com/LibenHailu/addisber_scraper/internal/adapter/storage/persistence/item"
 	"github.com/LibenHailu/addisber_scraper/internal/constant/model"
 	"github.com/LibenHailu/addisber_scraper/internal/module/item"
+	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -32,13 +35,19 @@ func Initialize() {
 
 	itemUsecase := item.Initialize(itemPersistence)
 
+	itemHandler := server.ItemInit(itemUsecase)
+
+	router := gin.Default()
+	v1 := router.Group("/api/v1")
+	routing.ItemRoutes(v1, itemHandler)
+
+	router.Run()
+
 	// Instantiate default collector
 	c := colly.NewCollector(
 		colly.AllowURLRevisit(),
 		// colly.Debugger(&debug.LogDebugger{}),
-		// colly.Async(true),
 	)
-	// c.Wait()
 
 	scrapHandler := scraper.ItemInit(c, itemUsecase)
 

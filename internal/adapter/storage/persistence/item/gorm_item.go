@@ -29,6 +29,17 @@ func (gp *itemGormPersistence) UpdateItem(item *model.Item) error {
 		// fmt.Println(err)
 		return err
 	}
-	// fmt.Println(err)
+
+	err = gp.conn.Model(&model.Item{}).Where("id = ?", foundItem.ID).Updates(*item).Error
 	return err
+}
+
+// SearchItem searches item on the database
+func (gp *itemGormPersistence) SearchItem(search string) ([]model.Item, error) {
+	// TODO: make this search order by best paramerter like rating
+	var items []model.Item
+
+	err := gp.conn.Raw("SELECT * FROM items WHERE title LIKE '%" + search + "%';").Scan(&items).Error
+
+	return items, err
 }

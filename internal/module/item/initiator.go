@@ -8,6 +8,7 @@ import (
 // Usecase interface contains function of business logic for domain item
 type Usecase interface {
 	UpdateItem(item *model.Item) error
+	SearchItem(search string) ([]model.Item, error)
 }
 
 // service defines all necessary service for domain item
